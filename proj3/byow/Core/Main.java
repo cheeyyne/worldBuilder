@@ -14,6 +14,7 @@ public class Main {
             engine.interactWithInputString(args[1]);
             System.out.println(engine.toString());
         } else {
+            System.out.println("blah");
             Engine engine = new Engine();
             engine.interactWithKeyboard();
         }
