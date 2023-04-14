@@ -1,20 +1,13 @@
 package byow.Core;
-
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
-
-import java.lang.Math;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 public class WorldGenerator {
-    public Integer[][] idArray;
-    public TETile[][] worldArray;
+    private Integer[][] idArray;
+    private TETile[][] worldArray;
     private int x;
     private int y;
     private Random random;
@@ -29,6 +22,11 @@ public class WorldGenerator {
         this.x = x;
         this.y = y;
         this.random = random;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     /**
@@ -65,11 +63,8 @@ public class WorldGenerator {
 
     /**
      * Generates a list of Room objects which have relevant and valid positions
-     * @param x
-     * @param y
-     * @return
      */
-    public ArrayList<Room> generateRoomIds(int x, int y) {
+    public ArrayList<Room> generateRoomIds(int x1, int y1) {
         int roomTotal = RandomUtils.uniform(random, 4) + 8;
         int xval = 0;
         int yval = 0;
@@ -79,8 +74,8 @@ public class WorldGenerator {
         int failcounter = 0;
         ArrayList<Room> returnList = new ArrayList<>();
         while (counter < roomTotal) {
-            xval = RandomUtils.uniform(random, x - 1) + 1;
-            yval = RandomUtils.uniform(random, y - 1) + 1;
+            xval = RandomUtils.uniform(random, x1 - 1) + 1;
+            yval = RandomUtils.uniform(random, y1 - 1) + 1;
             xrange = RandomUtils.uniform(random, 4) + 3;
             yrange = RandomUtils.uniform(random, 3) + 3;
             if (checkSpot(xval, yval, xrange, yrange)) {
@@ -93,7 +88,7 @@ public class WorldGenerator {
                  * if there are frequent fails, abort instead of looping
                  */
                 failcounter++;
-                if (failcounter > 100) {
+                if (failcounter > x) {
                     counter += roomTotal;
                 }
             }
@@ -140,7 +135,7 @@ public class WorldGenerator {
             travelX(room1.xWallPoint, room2.xWallPoint, room2.yWallPoint);
         }
     }
-    public void travelX(int x1, int x2, int y) {
+    public void travelX(int x1, int x2, int y1) {
         int difference;
         if (x1 < x2) {
             difference = 1;
@@ -148,11 +143,11 @@ public class WorldGenerator {
             difference = -1;
         }
         while (x1 != x2) {
-            this.idArray[x1][y] = 2;
+            this.idArray[x1][y1] = 2;
             x1 = x1 + difference;
         }
     }
-    public void travelY(int y1, int y2, int x) {
+    public void travelY(int y1, int y2, int x1) {
         int difference;
         if (y1 < y2) {
             difference = 1;
@@ -160,7 +155,7 @@ public class WorldGenerator {
             difference = -1;
         }
         while (y1 != y2) {
-            this.idArray[x][y1] = 2;
+            this.idArray[x1][y1] = 2;
             y1 = y1 + difference;
         }
     }
@@ -194,11 +189,11 @@ public class WorldGenerator {
             }
         }
     }
-    public void wallify(int x, int y) {
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
+    public void wallify(int xpos, int ypos) {
+        for (int i = 0; i < xpos; i++) {
+            for (int j = 0; j < ypos; j++) {
                 if (idArray[i][j] == 2) {
-                    pointify(i, j, x, y);
+                    pointify(i, j, xpos, ypos);
                 }
             }
         }
@@ -228,18 +223,4 @@ public class WorldGenerator {
      * @param args
      */
 
-    public static void main(String[] args) {
-        WorldGenerator ma = new WorldGenerator(new TETile[80][30], 80, 30, new Random(129));
-        System.out.println(ma.checkSpot(0, 0, 2, 3));
-        TERenderer ter = new TERenderer();
-        ter.initialize(80, 30);
-        ArrayList<Room> blah = ma.generateRoomIds(80, 30);
-        ma.hallify(blah);
-        ma.wallify(80,30);
-        ma.populateRealArray();
-        ma.worldArray[0][0] = Tileset.WALL;
-
-        ter.renderFrame(ma.worldArray);
-
-    }
 }

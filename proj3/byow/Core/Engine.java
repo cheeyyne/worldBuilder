@@ -40,14 +40,13 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
         // passed in as an argument, and return a 2D tile representation of the
         // world that would have been drawn if the same inputs had been given
         // to interactWithKeyboard().
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        Long blah = Long.parseLong(input.substring(1, input.length()-2));
+        Long blah = Long.parseLong(input.substring(1, input.length() - 2));
         WorldGenerator gen = new WorldGenerator(new TETile[WIDTH][HEIGHT], WIDTH, HEIGHT, new Random(blah));
         return gen.handle();
     }
