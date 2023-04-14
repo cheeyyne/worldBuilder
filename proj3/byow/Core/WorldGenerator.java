@@ -219,6 +219,7 @@ public class WorldGenerator {
         this.hallify(blah);
         this.wallify(x, y);
         this.populateRealArray();
+        ter.renderFrame(this.worldArray);
         return this.worldArray;
     }
 

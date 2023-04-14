@@ -47,7 +47,7 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        int blah = Integer.parseInt(input.substring(1, input.length()-2));
+        Long blah = Long.parseLong(input.substring(1, input.length()-2));
         WorldGenerator gen = new WorldGenerator(new TETile[WIDTH][HEIGHT], WIDTH, HEIGHT, new Random(blah));
         return gen.handle();
     }
