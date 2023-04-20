@@ -3,6 +3,10 @@ package byow.Core;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.File;
 import java.util.Random;
 
 public class Engine {
@@ -10,12 +14,28 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-
+    static File join(String first, String...others) {
+        return Paths.get(first, others).toFile();
+    }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        Random r = new Random();
+        int seedLength = r.nextInt(0, 10);
+        String seed = "";
+        for (int i = 0; i < seedLength; i++) {
+            String s = Integer.toString(r.nextInt(0, 10));
+            seed = seed + s;
+        }
+        int seed2 = Integer.parseInt(seed);
+        File save = join("/tmp/sp23-proj3-g1277", "save.txt");
+        Path save1 = Files.createFile(save.toPath());
+        Files.
+        WorldGenerator gen = new WorldGenerator(new TETile[WIDTH][HEIGHT], WIDTH, HEIGHT, new Random(seed2));
+        Interactive inter = new Interactive(WIDTH, HEIGHT, new Random(seed2), gen);
+        inter.handle();
     }
 
     /**
