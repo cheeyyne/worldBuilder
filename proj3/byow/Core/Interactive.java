@@ -2,7 +2,13 @@ package byow.Core;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+import edu.princeton.cs.algs4.ST;
 import edu.princeton.cs.algs4.StdDraw;
+
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,14 +21,27 @@ public class Interactive {
     private int y;
     private int playerX;
     private int playerY;
-    private Files saveLog;
-    private Path path;
-
-    public Interactive(int x, int y, Random random, WorldGenerator world) {
+    private File saveLog;
+    private FileWriter writer;
+    private TERenderer ter;
+    private MoveSequencer mover;
+    private boolean doFirst;
+    private Long seed;
+    public Interactive(int x, int y, Random random, WorldGenerator world, TERenderer ter, boolean first, Long seed) {
         this.worldArray = world.handle();
+        this.doFirst = first;
+        this.seed = seed;
+        this.mover = new MoveSequencer(this.worldArray, random);
         this.random = random;
+        this.ter = ter;
         this.x = x;
         this.y = y;
+        this.saveLog = new File("Save.txt");
+        try {
+            this.writer = new FileWriter("Save.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -39,49 +58,96 @@ public class Interactive {
             }
         }
     }
+    public Integer[] findPlayer() {
+        Integer[] returner = new Integer[2];
+        for (int i = 0; i < this.x; i++) {
+            for (int j = 0; j < y; j++) {
+                if (this.worldArray[i][j] == Tileset.AVATAR) {
+                    returner[0] = i;
+                    returner[1] = j;
+                    return returner;
+                }
+            }
+        }
+        return null;
+    }
     public TETile[][] handleI() {
         initializePos();
         return this.worldArray;
     }
-    public void handle() {
-        TETile[][] first = handleI();
-        TERenderer ter = new TERenderer();
-        ter.renderFrame(first);
-        while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char c = StdDraw.nextKeyTyped();
-                if (c == 'w') {
-                    if (this.worldArray[this.playerX][this.playerY + 1] == Tileset.FLOOR) {
-                        this.worldArray[this.playerX][this.playerY] = Tileset.FLOOR;
-                        this.worldArray[this.playerX][this.playerY + 1] = Tileset.AVATAR;
-                        this.playerY++;
-                    }
-                } else if (c == 'a') {
-                    if (this.worldArray[this.playerX - 1][this.playerY] == Tileset.FLOOR) {
-                        this.worldArray[this.playerX][this.playerY] = Tileset.FLOOR;
-                        this.worldArray[this.playerX - 1][this.playerY] = Tileset.AVATAR;
-                        this.playerX--;
-                    }
-                } else if (c == 's') {
-                    if (this.worldArray[this.playerX][this.playerY - 1] == Tileset.FLOOR) {
-                        this.worldArray[this.playerX][this.playerY] = Tileset.FLOOR;
-                        this.worldArray[this.playerX][this.playerY - 1] = Tileset.AVATAR;
-                        this.playerY--;
-                    }
-                } else if (c == 'd') {
-                    if (this.worldArray[this.playerX + 1][this.playerY] == Tileset.FLOOR) {
-                        this.worldArray[this.playerX][this.playerY] = Tileset.FLOOR;
-                        this.worldArray[this.playerX + 1][this.playerY] = Tileset.AVATAR;
-                        this.playerX++;
-                    }
-                } else if (c == ':') {
-                    if (StdDraw.nextKeyTyped() == 'q') {
+    public void stateToSaveString() {
+        String returner = this.x + " " + this.y + " " + this.seed;
+        returner += " " + this.playerX + " " + this.playerY;
+        TETile temp = null;
 
-                    }
-                }
+        for (int i = 0; i < this.x; i++) {
+            for (int j = 0; j < this.y; j++) {
+               temp = worldArray[i][j];
+               if (temp.equals(Tileset.NOTHING)) {
+                   returner += " 1";
+               } else if (temp.equals(Tileset.WALL)) {
+                   returner += " 2";
+               } else if (temp.equals(Tileset.FLOOR)) {
+                   returner += " 3";
+               } else if (temp.equals(Tileset.AVATAR)) {
+                   returner += " 4";
+               }
             }
+        }
+        try {
+            writer.write(returner);
+            System.out.println("worked");
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("nope dumbass");
+            throw new RuntimeException(e);
+        }
+    }
+    public void handle() {
+        if (this.doFirst) {
+            TETile[][] first = handleI();
+            ter.renderFrame(first);
+        } else {
+            Integer[] blah = this.findPlayer();
+            this.playerX = blah[0];
+            this.playerY = blah[1];
             ter.renderFrame(this.worldArray);
         }
+        Double mousePosx = .0;
+        Double mousePosy = .0;
+        String temp = "";
+
+        while (true) {
+            Color oldColor = StdDraw.getPenColor();
+            StdDraw.setPenColor(255, 255, 255);
+            mousePosx = StdDraw.mouseX();
+            mousePosy = StdDraw.mouseY();
+            temp = String.valueOf(mousePosx.intValue() + 1) + " " + String.valueOf(mousePosy.intValue() + 1);
+            StdDraw.text(this.x / 10.0, this.y / 10.0, temp);
+            StdDraw.show();
+            ter.renderFrame(this.worldArray);
+            if (StdDraw.hasNextKeyTyped()) {
+                char c = StdDraw.nextKeyTyped();
+                int response = this.mover.handleMove(c, playerX, playerY, ter);
+                if (response != 0) {
+                    if (c == 'w' || c == 'W') {
+                        this.playerY++;
+                    } else if (c == 'a' || c == 'A') {
+                        this.playerX--;
+                    } else if (c == 's' || c == 'S') {
+                        this.playerY--;
+                    } else if (c == 'd' || c == 'D') {
+                        this.playerX++;
+                    } else if (c == ':') {
+                        if (response == 1) {
+                            this.stateToSaveString();
+                            System.exit(0);
+                        }
+                    }
+                }
+                }
+        }
+
     }
 
 }

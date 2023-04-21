@@ -11,8 +11,10 @@ public class WorldGenerator {
     private int x;
     private int y;
     private Random random;
-    public WorldGenerator(TETile[][] worldArr, int x, int y, Random random) {
+    private boolean doRandom;
+    public WorldGenerator(TETile[][] worldArr, int x, int y, Random random, boolean dorand) {
         this.worldArray = worldArr;
+        this.doRandom = dorand;
         this.idArray = new Integer[x][y];
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
@@ -208,6 +210,9 @@ public class WorldGenerator {
         }
     }
     public TETile[][] handle() {
+        if (!this.doRandom) {
+            return this.worldArray;
+        }
         TERenderer ter = new TERenderer();
         ter.initialize(this.x, this.y);
         ArrayList<Room> blah = this.generateRoomIds(x, y);
