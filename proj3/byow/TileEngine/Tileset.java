@@ -17,9 +17,11 @@ import java.awt.Color;
  */
 
 public class Tileset {
-    public static final TETile AVATAR = new TETile('@', Color.white, Color.black, "you");
+    public static Color playerColor;
+    public static TETile AVATAR = new TETile('@', Color.white, playerColor, "you");
+    public static final TETile AVATAROLD = new TETile('@', Color.white, Color.black, "you");
     public static final TETile WALL = new TETile('#', new Color(216, 128, 128), Color.darkGray,
-            "wall");
+            "wall", "test_pixel.png");
     public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black,
             "floor");
     public static final TETile NOTHING = new TETile(' ', Color.black, Color.black, "nothing");
@@ -33,6 +35,9 @@ public class Tileset {
     public static final TETile SAND = new TETile('▒', Color.yellow, Color.black, "sand");
     public static final TETile MOUNTAIN = new TETile('▲', Color.gray, Color.black, "mountain");
     public static final TETile TREE = new TETile('♠', Color.green, Color.black, "tree");
+    public void setPlayerColor(Color in) {
+        AVATAR = new TETile('@', in, Color.BLACK, "you");;
+    }
 }
 
 

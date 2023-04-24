@@ -15,7 +15,6 @@ import java.util.Random;
 
 public class Interactive {
     private TETile[][] worldArray;
-    private WorldGenerator world;
     private Random random;
     private int x;
     private int y;
@@ -99,6 +98,22 @@ public class Interactive {
             throw new RuntimeException(e);
         }
     }
+    public TETile[][] torchify() {
+        TETile[][] returner = new TETile[this.x][this.y];
+        for (int i = 0; i < this.x; i++) {
+            for (int j = 0; j < this.y; j++) {
+                if (distanceTo(i, j, this.playerX, this.playerY) > 4) {
+                    returner[i][j] = Tileset.NOTHING;
+                } else {
+                    returner[i][j] = this.worldArray[i][j];
+                }
+            }
+        }
+        return returner;
+    }
+    public int distanceTo(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
     public void handle() {
         if (this.doFirst) {
             TETile[][] first = handleI();
@@ -112,7 +127,8 @@ public class Interactive {
         Double mousePosx = .0;
         Double mousePosy = .0;
         String temp = "yeah";
-        String temp2 = "";
+        String disclaimer = "(z) Lights";
+        boolean torchified = true;
 
         while (true) {
             Color oldColor = StdDraw.getPenColor();
@@ -121,39 +137,51 @@ public class Interactive {
             mousePosy = StdDraw.mouseY();
             int arrayX = mousePosx.intValue();
             int arrayY = mousePosy.intValue();
-            if (worldArray[arrayX][arrayY] == Tileset.NOTHING) {
-                temp = "";
-            } else if (worldArray[arrayX][arrayY] == Tileset.WALL) {
-                temp = "wall";
-            } else if (worldArray[arrayX][arrayY] == Tileset.FLOOR) {
-                temp = "floor";
-            } else {
-                temp = "player";
+            if (arrayY == 30) {
+                arrayY--;
             }
-            StdDraw.text(this.x / 10.0, this.y / 10.0, temp);
+            if (worldArray[arrayX][arrayY] == Tileset.NOTHING) {
+                temp = "Void";
+            } else if (worldArray[arrayX][arrayY] == Tileset.WALL) {
+                temp = "Wall";
+            } else if (worldArray[arrayX][arrayY] == Tileset.FLOOR) {
+                temp = "Floor";
+            } else {
+                temp = "Player";
+            }
+            if (torchified) {
+                if (distanceTo(arrayX, arrayY, this.playerX, this.playerY) < 5) {
+                    StdDraw.text(this.x / 10.0, this.y / 9.1, temp);
+                }
+            } else {
+                StdDraw.text(this.x / 10.0, this.y / 9.1, temp);
+            }
+            StdDraw.text(this.x / 10.0, this.y / 14.0, disclaimer);
             StdDraw.show();
-            ter.renderFrame(this.worldArray);
+            if (torchified) {
+                ter.renderFrame(torchify());
+            } else {
+                ter.renderFrame(this.worldArray);
+            }
             if (StdDraw.hasNextKeyTyped()) {
                 char c = StdDraw.nextKeyTyped();
                 int response = this.mover.handleMove(c, playerX, playerY, ter);
                 if (response != 0) {
                     if (c == 'w' || c == 'W') {
                         this.playerY++;
-                        ter.renderFrame(this.worldArray);
                     } else if (c == 'a' || c == 'A') {
                         this.playerX--;
-                        ter.renderFrame(this.worldArray);
                     } else if (c == 's' || c == 'S') {
                         this.playerY--;
-                        ter.renderFrame(this.worldArray);
                     } else if (c == 'd' || c == 'D') {
                         this.playerX++;
-                        ter.renderFrame(this.worldArray);
                     } else if (c == ':') {
                         if (response == 1) {
                             this.stateToSaveString();
                             System.exit(0);
                         }
+                    } else if (c == 'z') {
+                        torchified = !torchified;
                     }
                 }
                 }

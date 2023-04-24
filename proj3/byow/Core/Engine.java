@@ -16,9 +16,6 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-    static File join(String first, String...others) {
-        return Paths.get(first, others).toFile();
-    }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -29,6 +26,8 @@ public class Engine {
         Menu mainMenu = new Menu(ter, WIDTH, HEIGHT);
         ter.initialize(WIDTH, HEIGHT);
         mainMenu.drawMenu();
+        int charnum = 2;
+        mainMenu.drawMenuCharacter(charnum - 1);
         while (true) {
             if (StdDraw.hasNextKeyTyped()) {
                 char c = StdDraw.nextKeyTyped();
@@ -42,6 +41,9 @@ public class Engine {
                     break;
                 } else if (c == 'l' || c == 'L') {
                     loadSave(true);
+                } else if (c == 'c' || c == 'C') {
+                    mainMenu.drawMenuCharacter(charnum);
+                    charnum++;
                 }
             }
         }

@@ -47,7 +47,6 @@ public class MoveSequencer {
             if (this.worldArray[playerXin][playerYin + 1] == Tileset.FLOOR) {
                 this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
                 this.worldArray[playerXin][playerYin + 1] = Tileset.AVATAR;
-                ter.renderFrame(this.worldArray);
                 this.playerX = playerXin;
                 this.playerY = playerYin + 1;
                 return 11;
@@ -56,7 +55,6 @@ public class MoveSequencer {
             if (this.worldArray[playerXin - 1][playerYin] == Tileset.FLOOR) {
                 this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
                 this.worldArray[playerXin - 1][playerYin] = Tileset.AVATAR;
-                ter.renderFrame(this.worldArray);
                 this.playerX = playerXin - 1;
                 this.playerY = playerYin;
                 return 12;
@@ -65,7 +63,6 @@ public class MoveSequencer {
             if (this.worldArray[playerXin][playerYin - 1] == Tileset.FLOOR) {
                 this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
                 this.worldArray[playerXin][playerYin - 1] = Tileset.AVATAR;
-                ter.renderFrame(this.worldArray);
                 this.playerX = playerXin;
                 this.playerY = playerYin - 1;
                 return 13;
@@ -74,7 +71,6 @@ public class MoveSequencer {
             if (this.worldArray[playerXin + 1][playerYin] == Tileset.FLOOR) {
                 this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
                 this.worldArray[playerXin + 1][playerYin] = Tileset.AVATAR;
-                ter.renderFrame(this.worldArray);
                 this.playerX = playerXin + 1;
                 this.playerY = playerYin;
                 return 14;
@@ -85,6 +81,8 @@ public class MoveSequencer {
                     return 1;
                 }
             }
+        } else if (c == 'z') {
+            return 26;
         }
         return 0;
     }
