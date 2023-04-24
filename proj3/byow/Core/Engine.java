@@ -6,7 +6,6 @@ import byow.TileEngine.Tileset;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Paths;
 import java.io.File;
 import java.util.Random;
 import java.util.Scanner;
