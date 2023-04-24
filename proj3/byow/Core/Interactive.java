@@ -21,7 +21,6 @@ public class Interactive {
     private int y;
     private int playerX;
     private int playerY;
-    private File saveLog;
     private FileWriter writer;
     private TERenderer ter;
     private MoveSequencer mover;
@@ -31,17 +30,11 @@ public class Interactive {
         this.worldArray = world.handle();
         this.doFirst = first;
         this.seed = seed;
-        this.mover = new MoveSequencer(this.worldArray, random);
+        this.mover = new MoveSequencer(this.worldArray, random, this.x, this.y, this.seed);
         this.random = random;
         this.ter = ter;
         this.x = x;
         this.y = y;
-        this.saveLog = new File("Save.txt");
-        try {
-            this.writer = new FileWriter("Save.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
     }
 
@@ -95,11 +88,14 @@ public class Interactive {
             }
         }
         try {
+            this.writer = new FileWriter("Save.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
             writer.write(returner);
-            System.out.println("worked");
             writer.close();
         } catch (IOException e) {
-            System.out.println("nope dumbass");
             throw new RuntimeException(e);
         }
     }
@@ -115,14 +111,25 @@ public class Interactive {
         }
         Double mousePosx = .0;
         Double mousePosy = .0;
-        String temp = "";
+        String temp = "yeah";
+        String temp2 = "";
 
         while (true) {
             Color oldColor = StdDraw.getPenColor();
             StdDraw.setPenColor(255, 255, 255);
             mousePosx = StdDraw.mouseX();
             mousePosy = StdDraw.mouseY();
-            temp = String.valueOf(mousePosx.intValue() + 1) + " " + String.valueOf(mousePosy.intValue() + 1);
+            int arrayX = mousePosx.intValue();
+            int arrayY = mousePosy.intValue();
+            if (worldArray[arrayX][arrayY] == Tileset.NOTHING) {
+                temp = "";
+            } else if (worldArray[arrayX][arrayY] == Tileset.WALL) {
+                temp = "wall";
+            } else if (worldArray[arrayX][arrayY] == Tileset.FLOOR) {
+                temp = "floor";
+            } else {
+                temp = "player";
+            }
             StdDraw.text(this.x / 10.0, this.y / 10.0, temp);
             StdDraw.show();
             ter.renderFrame(this.worldArray);
@@ -132,12 +139,16 @@ public class Interactive {
                 if (response != 0) {
                     if (c == 'w' || c == 'W') {
                         this.playerY++;
+                        ter.renderFrame(this.worldArray);
                     } else if (c == 'a' || c == 'A') {
                         this.playerX--;
+                        ter.renderFrame(this.worldArray);
                     } else if (c == 's' || c == 'S') {
                         this.playerY--;
+                        ter.renderFrame(this.worldArray);
                     } else if (c == 'd' || c == 'D') {
                         this.playerX++;
+                        ter.renderFrame(this.worldArray);
                     } else if (c == ':') {
                         if (response == 1) {
                             this.stateToSaveString();

@@ -25,6 +25,8 @@ public class Engine {
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
+    private int px;
+    private int py;
     public void interactWithKeyboard() {
         TERenderer ter = new TERenderer();
         Menu mainMenu = new Menu(ter, WIDTH, HEIGHT);
@@ -42,12 +44,12 @@ public class Engine {
                     inter.handle();
                     break;
                 } else if (c == 'l' || c == 'L') {
-                    loadSave();
+                    loadSave(true);
                 }
             }
         }
     }
-    public TETile[][] loadSave() {
+    public TETile[][] loadSave(Boolean interactive) {
         Scanner sc = null;
         try {
             sc = new Scanner(new File("./Save.txt"));
@@ -73,16 +75,18 @@ public class Engine {
                         returner[i][j] = Tileset.FLOOR;
                     } else {
                         returner[i][j] = Tileset.AVATAR;
-                        pX = i;
-                        pY = j;
+                        this.px = i;
+                        this.py = j;
                     }
                 }
             }
         }
         Random mainRand = new Random(seed);
-        WorldGenerator gen = new WorldGenerator(returner, WIDTH, HEIGHT, mainRand, false);
-        Interactive inter = new Interactive(WIDTH, HEIGHT, mainRand, gen, ter, false, seed);
-        inter.handle();
+        if (interactive) {
+            WorldGenerator gen = new WorldGenerator(returner, WIDTH, HEIGHT, mainRand, false);
+            Interactive inter = new Interactive(WIDTH, HEIGHT, mainRand, gen, ter, false, seed);
+            inter.handle();
+        }
         return returner;
     }
 
@@ -116,8 +120,12 @@ public class Engine {
         int pointer1 = 0;
         int pointer2 = 0;
         Boolean toggle = true;
+        boolean b = (seed.charAt(0) == 'l' || seed.charAt(0) == 'L');
+        if (b) {
+            toggle = false;
+        }
         while (toggle) {
-            if (seed.charAt(pointer1) == 'N') {
+            if (seed.charAt(pointer1) == 'N' || seed.charAt(pointer1) == 'n') {
                 pointer1++;
                 toggle = false;
             } else {
@@ -127,10 +135,12 @@ public class Engine {
                 }
             }
         }
-        toggle = true;
+        if (!b) {
+            toggle = true;
+        }
         pointer2 = pointer1 + 1;
         while (toggle) {
-            if (seed.charAt(pointer2) == 'S') {
+            if (seed.charAt(pointer2) == 'S' || seed.charAt(pointer2) == 's') {
                 toggle = false;
             } else {
                 pointer2++;
@@ -139,10 +149,64 @@ public class Engine {
                 }
             }
         }
-        Long seedInt = Long.parseLong(seed.substring(pointer1, pointer2));
+        Long seedInt;
+        String temp;
+        Scanner sc;
+        if (!b) {
+            seedInt = Long.parseLong(seed.substring(pointer1, pointer2));
+        } else {
+            try {
+                sc = new Scanner(new File("./Save.txt"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            sc.nextInt();
+            sc.nextInt();
+            seedInt = sc.nextLong();
+        }
         Random mainRand = new Random(seedInt);
         String moveSequence = seed.substring(pointer2,  seed.length());
-        WorldGenerator gen = new WorldGenerator(new TETile[WIDTH][HEIGHT], WIDTH, HEIGHT, mainRand, true);
-        return gen.handle();
+        MoveSequencer mover;
+        WorldGenerator gen;
+        TETile[][] worldFromSave = new TETile[WIDTH][HEIGHT];
+        if (b) {
+            worldFromSave = loadSave(false);
+            gen = new WorldGenerator(worldFromSave, WIDTH, HEIGHT, mainRand, true);
+        } else {
+            gen = new WorldGenerator(new TETile[WIDTH][HEIGHT], WIDTH, HEIGHT, mainRand, true);
+        }
+        mover = new MoveSequencer(gen.handle(), mainRand, WIDTH, HEIGHT, seedInt);
+        mover.setSequence(moveSequence);
+        if (b) {
+            mover.setPlayerX(px);
+            mover.setPlayerY(py);
+        } else {
+            mover.initializePos();
+        }
+        TETile[][] returner = mover.handleString(moveSequence);
+        ter.renderFrame(returner);
+        return returner;
+    }
+    public int findPlayerX(TETile[][] worldArray) {
+        int x = 0;
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT; j++) {
+                if (worldArray[i][j] == Tileset.AVATAR) {
+                    return i;
+                }
+            }
+        }
+        return 0;
+    }
+    public int findPlayerY(TETile[][] worldArray) {
+        int y = 0;
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT; j++) {
+                if (worldArray[i][j] == Tileset.AVATAR) {
+                    return j;
+                }
+            }
+        }
+        return 0;
     }
 }
