@@ -6,8 +6,6 @@ import byow.TileEngine.Tileset;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.File;
 import java.util.Random;
@@ -28,7 +26,6 @@ public class Engine {
     private int px;
     private int py;
     public void interactWithKeyboard() {
-        TERenderer ter = new TERenderer();
         Menu mainMenu = new Menu(ter, WIDTH, HEIGHT);
         ter.initialize(WIDTH, HEIGHT);
         mainMenu.drawMenu();

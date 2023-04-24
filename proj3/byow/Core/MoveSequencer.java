@@ -35,62 +35,62 @@ public class MoveSequencer {
     public void setSequence(String sq) {
         this.sequence = sq;
     }
-    public void setPlayerX(Integer x) {
-        this.playerX = x;
+    public void setPlayerX(Integer a) {
+        this.playerX = a;
     }
-    public void setPlayerY(int y) {
-        this.playerY = y;
+    public void setPlayerY(int a) {
+        this.playerY = a;
     }
 
-    public int handleMove(char c, int playerX, int playerY, TERenderer ter) {
-            if (c == 'w' || c == 'W') {
-                if (this.worldArray[playerX][playerY + 1] == Tileset.FLOOR) {
-                    this.worldArray[playerX][playerY] = Tileset.FLOOR;
-                    this.worldArray[playerX][playerY + 1] = Tileset.AVATAR;
-                    ter.renderFrame(this.worldArray);
-                    this.playerX = playerX;
-                    this.playerY = playerY + 1;
-                    return 11;
-                }
-            } else if (c == 'a' || c == 'A') {
-                if (this.worldArray[playerX - 1][playerY] == Tileset.FLOOR) {
-                    this.worldArray[playerX][playerY] = Tileset.FLOOR;
-                    this.worldArray[playerX - 1][playerY] = Tileset.AVATAR;
-                    ter.renderFrame(this.worldArray);
-                    this.playerX = playerX - 1;
-                    this.playerY = playerY;
-                    return 12;
-                }
-            } else if (c == 's' || c == 'S') {
-                if (this.worldArray[playerX][playerY - 1] == Tileset.FLOOR) {
-                    this.worldArray[playerX][playerY] = Tileset.FLOOR;
-                    this.worldArray[playerX][playerY - 1] = Tileset.AVATAR;
-                    ter.renderFrame(this.worldArray);
-                    this.playerX = playerX;
-                    this.playerY = playerY - 1;
-                    return 13;
-                }
-            } else if (c == 'd' || c == 'D') {
-                if (this.worldArray[playerX + 1][playerY] == Tileset.FLOOR) {
-                    this.worldArray[playerX][playerY] = Tileset.FLOOR;
-                    this.worldArray[playerX + 1][playerY] = Tileset.AVATAR;
-                    ter.renderFrame(this.worldArray);
-                    this.playerX = playerX + 1;
-                    this.playerY = playerY;
-                    return 14;
-                }
-            } else if (c == ':') {
-                while (true) {
-                    if (StdDraw.hasNextKeyTyped() && StdDraw.nextKeyTyped() == 'q') {
-                        return 1;
-                    }
+    public int handleMove(char c, int playerXin, int playerYin, TERenderer ter) {
+        if (c == 'w' || c == 'W') {
+            if (this.worldArray[playerXin][playerYin + 1] == Tileset.FLOOR) {
+                this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
+                this.worldArray[playerXin][playerYin + 1] = Tileset.AVATAR;
+                ter.renderFrame(this.worldArray);
+                this.playerX = playerXin;
+                this.playerY = playerYin + 1;
+                return 11;
+            }
+        } else if (c == 'a' || c == 'A') {
+            if (this.worldArray[playerXin - 1][playerYin] == Tileset.FLOOR) {
+                this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
+                this.worldArray[playerXin - 1][playerYin] = Tileset.AVATAR;
+                ter.renderFrame(this.worldArray);
+                this.playerX = playerXin - 1;
+                this.playerY = playerYin;
+                return 12;
+            }
+        } else if (c == 's' || c == 'S') {
+            if (this.worldArray[playerXin][playerYin - 1] == Tileset.FLOOR) {
+                this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
+                this.worldArray[playerXin][playerYin - 1] = Tileset.AVATAR;
+                ter.renderFrame(this.worldArray);
+                this.playerX = playerXin;
+                this.playerY = playerYin - 1;
+                return 13;
+            }
+        } else if (c == 'd' || c == 'D') {
+            if (this.worldArray[playerXin + 1][playerYin] == Tileset.FLOOR) {
+                this.worldArray[playerXin][playerYin] = Tileset.FLOOR;
+                this.worldArray[playerXin + 1][playerYin] = Tileset.AVATAR;
+                ter.renderFrame(this.worldArray);
+                this.playerX = playerXin + 1;
+                this.playerY = playerYin;
+                return 14;
+            }
+        } else if (c == ':') {
+            while (true) {
+                if (StdDraw.hasNextKeyTyped() && StdDraw.nextKeyTyped() == 'q') {
+                    return 1;
                 }
             }
-            return 0;
+        }
+        return 0;
     }
     public void initializePos() {
         boolean initialized = false;
-        while (initialized == false) {
+        while (!initialized) {
             int xpos = RandomUtils.uniform(this.mainRand, 0, this.x);
             int ypos = RandomUtils.uniform(this.mainRand, 0, this.y);
             if (this.worldArray[xpos][ypos] == Tileset.FLOOR) {
@@ -142,6 +142,7 @@ public class MoveSequencer {
                 handleMove(s.charAt(i), this.playerX, this.playerY, ter);
             }
         }
-    return this.worldArray;
+        this.worldArray[this.playerX][this.playerY] = Tileset.AVATAR;
+        return this.worldArray;
     }
 }
